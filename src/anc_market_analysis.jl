@@ -114,3 +114,18 @@ anc_market_data_aug = anc_market_data[
     size=(800,600),
     minorgrid=true)
     savefig("../figures/bar_aug_nonzero_ancillary_pricing")
+
+# We selected Feb 28th, 2019 so creating a csv holding on relevant data for that
+# day...
+filename = "../data/OASIS_Real_Time_Dispatch_Ancillary_Services_Feb28.csv";
+price_trace = CSV.File(filename; dateformat="yyyy/mm/dd HH:MM:SS") |> DataFrame;
+# pull out relevant info
+selected_price_trace = price_trace[
+    (map(x -> Dates.Date(x) == Dates.Date(2019,2,28),
+        price_trace[:,Symbol("RTD End Time Stamp")])) .& (price_trace[:,Symbol("Zone Name")] .== "HUD VL"),
+    [Symbol("RTD End Time Stamp"),
+    Symbol("RTD 10 Min Non Sync"),
+    Symbol("RTD 30 Min Non Sync")]]
+
+CSV.write("../data/anc_price_trace_feb28_2019.csv",
+    selected_price_trace);
