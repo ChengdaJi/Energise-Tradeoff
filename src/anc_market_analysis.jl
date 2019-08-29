@@ -115,17 +115,49 @@ anc_market_data_aug = anc_market_data[
     minorgrid=true)
     savefig("../figures/bar_aug_nonzero_ancillary_pricing")
 
-# We selected Feb 28th, 2019 so creating a csv holding on relevant data for that
+# We selected Feb 28th, 2019 so creating a csv holding all relevant data for that
 # day...
+
+# get ancillary price data
 filename = "../data/OASIS_Real_Time_Dispatch_Ancillary_Services_Feb28.csv";
 price_trace = CSV.File(filename; dateformat="yyyy/mm/dd HH:MM:SS") |> DataFrame;
-# pull out relevant info
+# We pull out data only on Feb 28th, 2019 that aligns with every 5 minutes.
+# There are 2 extra data points off the 5 minute interval we are ignoring.
+# We also ensure it's from the Hudson Valley region.
 selected_price_trace = price_trace[
-    (map(x -> Dates.Date(x) == Dates.Date(2019,2,28),
-        price_trace[:,Symbol("RTD End Time Stamp")])) .& (price_trace[:,Symbol("Zone Name")] .== "HUD VL"),
+    (map(x -> (Dates.Date(x) == Dates.Date(2019,2,28))
+                .& (Dates.value(Dates.Minute(x)) % 5 == 0),
+        price_trace[:,Symbol("RTD End Time Stamp")])
+    .& (price_trace[:,Symbol("Zone Name")] .== "HUD VL")),
     [Symbol("RTD End Time Stamp"),
     Symbol("RTD 10 Min Non Sync"),
     Symbol("RTD 30 Min Non Sync")]]
 
-CSV.write("../data/anc_price_trace_feb28_2019.csv",
-    selected_price_trace);
+# get real time LBMP data
+filename = "../data/OASIS_Real_Time_Dispatch_Zonal_LBMP.csv";
+rt_lbmp_trace = CSV.File(filename; dateformat="yyyy/mm/dd HH:MM:SS") |> DataFrame;
+# pull out relevant info
+selected_rt_lbmp_trace = rt_lbmp_trace[
+    (map(x -> (Dates.Date(x) == Dates.Date(2019,2,28))
+                .& (Dates.value(Dates.Minute(x)) % 5 == 0),
+        rt_lbmp_trace[:,Symbol("RTD End Time Stamp")])
+    .& (rt_lbmp_trace[:,Symbol("Zone Name")] .== "HUD VL")),
+    [Symbol("RTD Zonal LBMP")]]
+rename!(selected_rt_lbmp_trace, Symbol("RTD Zonal LBMP") => Symbol("Real Time LBMP"))
+
+# get day ahead LBMP data
+filename = "../data/20190228damlbmp_zone.csv";
+da_lbmp_trace = CSV.File(filename, dateformat="mm/dd/yyyy HH:MM") |> DataFrame;
+# pull out relevant info
+selected_da_lbmp_trace = da_lbmp_trace[
+    (da_lbmp_trace[:,Symbol("Name")] .== "HUD VL"),
+    [Symbol("LBMP (\$/MWHr)")]];
+# pad to necessary length
+selected_da_lbmp_trace = repeat(selected_da_lbmp_trace, inner=12);
+rename!(selected_da_lbmp_trace, Symbol("LBMP (\$/MWHr)") => Symbol("Day Ahead LBMP"))
+
+feb28_trace = hcat(selected_price_trace, selected_rt_lbmp_trace,
+    selected_da_lbmp_trace)
+
+CSV.write("../data/trace_feb28_2019.csv",
+    feb28_trace);
