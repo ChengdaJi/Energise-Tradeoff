@@ -34,9 +34,14 @@ icdf = -1.6449; #0.95
 # icdf = -1.0364 #0.85
 
 # # prediction Pred_length
-Pred_length=24; # 5 min per slots
-## read solar
+Pred_length=24; # 2 hrs 5 min per slots
+# Pred_length=12; # 2 hrs 5 min per slots
+# Pred_length=6; # 2 hrs 5 min per slots
+
+## solar error
 solar_error_max = 0.025;
+# solar_error_max = 0.05;
+# solar_error_max = 0.1;
 ################################################################################
 
 
