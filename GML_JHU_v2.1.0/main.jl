@@ -90,8 +90,3 @@ for current_time=1:T
     write_output_out(val_opt, current_time)
     println("=================================================")
 end
-
-
-
-# Pd_rt=pd_raw_one["Pd"][:,1:288]/1000 + error_fixed;
-# println("GML - optimization finished")
