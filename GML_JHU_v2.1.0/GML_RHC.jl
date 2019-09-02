@@ -183,7 +183,7 @@ price, ancillary_type);
                 if t==1
                     @constraint(m, B[scenario,feeder,1] == B_rt[feeder,1]-delta_t*R_rt[feeder,1])
                 else
-                    @constraint(m, B[scenario,feeder,1] ==
+                    @constraint(m, B[scenario,feeder,t] ==
                         B[scenario,feeder,t-1] - R[scenario,feeder,t-1]*delta_t)
                 end
                 @constraint(m, Qf_min[feeder,t+1] <= Qf[scenario,feeder,t]);
