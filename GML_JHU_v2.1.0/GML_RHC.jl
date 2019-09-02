@@ -173,7 +173,7 @@ price, ancillary_type);
     for scenario = 1:SN
         for t=1:T-1
             for feeder=1:F
-                @constraint(m, Pg_min[feeder, t]<=Pg[scenario, feeder ,t]);
+                @constraint(m, Pg_min[feeder, t+1]<=Pg[scenario, feeder ,t]);
                 @constraint(m, Pg[scenario, feeder ,t]<=
                     positive_scalar(icdf*sqrt(pd.sigma[feeder,t]+pg.sigma[feeder,t])+pg.mu_scenario[feeder,t]));
                 @constraint(m, B_min[feeder,t+1] <= B[scenario,feeder,t]);
