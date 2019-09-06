@@ -300,7 +300,7 @@ end
 function write_output_out(val_opt, current_time)
         # write the solar file
     println("===== GML - Write Output File");
-    name=string("results/Time", current_time, ".csv");
+    name=string("results/Time", current_time, "_85chance.csv");
     cost = repeat([val_opt.cost], 12, 1)
     time = repeat([val_opt.time], 12, 1)
     global feeder_num=[string("feeder",1)]

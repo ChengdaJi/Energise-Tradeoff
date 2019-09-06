@@ -29,9 +29,9 @@ SN=6;
 # penetation level
 p_rate=0.5; # 0.25 0.5 0.75 1
 
-icdf = -1.6449; #0.95
-# icdf = -1.2816 #0.9
-# icdf = -1.0364 #0.85
+#icdf = -1.6449; #0.95
+#icdf = -1.2816 #0.9
+icdf = -1.0364 #0.85
 
 # # prediction Pred_length
 Pred_length=24; # 2 hrs 5 min per slots
