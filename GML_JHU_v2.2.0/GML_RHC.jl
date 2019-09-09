@@ -479,10 +479,10 @@ function positive_scalar(Scalar_)
     return Scalar_
 end
 
-function write_output_out(val_opt, current_time)
+function write_output_out(val_opt, filename)
         # write the solar file
     println("===== GML - Write Output File");
-    name=string("results/Chengda/Solar0025Time", current_time, ".csv");
+    # name=string("results/Solar0025Time", current_time, ".csv");
     cost = repeat([val_opt.cost], 12, 1)
     time = repeat([val_opt.time], 12, 1)
     P_0 = repeat([val_opt.P_0], 12, 1)
@@ -492,7 +492,7 @@ function write_output_out(val_opt, current_time)
         feeder_num=vcat(feeder_num, string("feeder",i))
     end
     RT_data_feeder=hcat(feeder_num, val_opt.Pf, val_opt.Qf, val_opt.Pg, val_opt.B,val_opt.R, p_rsrv, P_0, cost, time)
-    CSV.write(name, DataFrame(RT_data_feeder, [:Feeder, :Pf, :QF, :Pg, :B, :R, :P_rsrv, :P_0, :Cost, :time]));
+    CSV.write(filename, DataFrame(RT_data_feeder, [:Feeder, :Pf, :QF, :Pg, :B, :R, :P_rsrv, :P_0, :Cost, :time]));
     # println("    ---- Finish writting files! ")
 end
 
