@@ -14,7 +14,7 @@ include("traj_gen.jl")
 include("GML_struct.jl")
 include("GML_RHC.jl")
 
-function main(T, BN, F, SN, p_rate, icdf, Pred_length, solar_error_max,
+function main(ancillary_type, T, BN, F, SN, p_rate, icdf, Pred_length, solar_error_max,
     price_raw, delta_rt_raw, pd_raw, pd_noise, pg_noise, pg_raw,
     folder, filename)
 
