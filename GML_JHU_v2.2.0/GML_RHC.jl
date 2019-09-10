@@ -361,10 +361,10 @@ price, ancillary_type);
     println(string("    ----", termination_status(m)))
     # println(MOI.PrimalStatus())
     # println(MOI.DualStatus())
-    cost_o = JuMP.objective_value(m);
+    cost_current_data = JuMP.objective_value(m);
     time_solve=MOI.get(m, MOI.SolveTime());
     println(string("    ----Solve Time: ", time_solve))
-    println(string("    ----Optimal Cost: ", cost_o))
+    println(string("    ----Optimal Cost: ", cost_current_data))
     ## obtaining value
     Qf_o=JuMP.value.(Qf_rt)
     Pg_o=JuMP.value.(Pg_rt)

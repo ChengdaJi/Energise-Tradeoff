@@ -44,10 +44,10 @@ function main(ancillary_type, T, BN, F, SN, p_rate, icdf, Pred_length, solar_err
         else
             push!(P_rsrv_feedback,val_opt.P_rsrv)
         end
-
+        println(val_opt.cost)
         mkpath(folder)
         write_output_out(val_opt,
-            string(folder, filename, "_time_", current_time, ".csv"))
+            string(folder, filename, "_time", current_time, ".csv"))
         println("=================================================")
 
     end

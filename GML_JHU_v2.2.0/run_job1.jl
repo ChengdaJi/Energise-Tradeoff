@@ -1,5 +1,4 @@
 # This runs all of the jobs necessary for our trade-off analysis
-using Distributed
 
 include("main.jl")
 
@@ -49,13 +48,12 @@ pg_raw = read_solar_data()
 
 # baseline is 95% chance constraint, 2 hour prediction length,
 # and maximum solar error variance 0.025
-default_i = -1.6449; default_pred_length = 24; default_sem = 0.025;
+default_i = -1.6449; default_pred_length = 24; default_sem = 0.1;
 
 for a_type in ancillary_type
     for p in p_rate
 
         for i in icdf
-
             folder = string("./results/");
             filename = "";
             if a_type == "without"
