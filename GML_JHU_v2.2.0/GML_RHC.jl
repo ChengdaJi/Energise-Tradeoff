@@ -1,6 +1,7 @@
 function GML_Sys_Ava(T, F, BN, SN, pd, ancillary_type, icdf)
 
     println("===== GML - Boundaries Buildup");
+
     ###############################################################################
 
     # feeder level
@@ -17,13 +18,9 @@ function GML_Sys_Ava(T, F, BN, SN, pd, ancillary_type, icdf)
     R_min = -R_max;
     W=zeros(F,T);
     # ancillary
-    if ancillary_type == "10min"
-        tau=2;
-    elseif ancillary_type == "30min"
-        tau=6;
-    else
-        tau=2;
-    end
+
+    tau=2;
+
     P_rsrv_min=zeros(1,T);
     k=12;
 
@@ -45,8 +42,7 @@ function GML_Sys_Ava(T, F, BN, SN, pd, ancillary_type, icdf)
     return obj
 end
 
-function optimal_stoach_scenario(current_time, obj, feedback, pd, pg,
-price, ancillary_type);
+function optimal_stoach_scenario(current_time, obj, feedback, pd, pg, price, ancillary_type)
     println("===== GML - Optimization ")
 
     #################
@@ -220,7 +216,7 @@ price, ancillary_type);
     end
     ###########################################################################
     # variables and Constraints for reserve markets
-    if ancillary_type == "10min" || ancillary_type == "30min"
+    if ancillary_type == "10min"
         # RT
         @variable(m, P_rsrv_rt)
         @variable(m, B_rsrv_rt)
@@ -349,12 +345,15 @@ price, ancillary_type);
             end
         end
     end
-    if ancillary_type == "10min" || ancillary_type == "30min"
+    if ancillary_type == "10min"
         @objective(m, Min,
             fn_cost_RHC_anc(delta_t,P_hat_rt,P_hat,Pg_rt,Pg,P_rsrv_rt,P_rsrv,price,pg,pd,beta,SN,obj))
-    else
+    elseif ancillary_type == "without"
         @objective(m, Min,
             fn_cost_RHC_rt(delta_t,P_hat_rt,P_hat,Pg_rt,Pg,price,pg,pd,beta,SN,obj))
+    else
+        println("Invalid ancillary type");
+        exit()
     end
     status=optimize!(m);
 
@@ -374,14 +373,17 @@ price, ancillary_type);
     Q_hat_o=JuMP.value.(Q_hat_rt)
     l_o=JuMP.value.(l_rt)
     v_o=JuMP.value.(v_rt)
-    if ancillary_type == "10min" || ancillary_type == "30min"
+    if ancillary_type == "10min"
         P_rsrv_o=JuMP.value(P_rsrv_rt);
         B_rsrv_o=JuMP.value(B_rsrv_rt);
         P_rsrv_s=JuMP.value.(P_rsrv);
         B_rsrv_s=JuMP.value.(B_rsrv);
-    else
+    elseif ancillary_type == "without"
         P_rsrv_o = 0;
         B_rsrv_o = 0;
+    else
+        println("Invalid ancillary type.")
+        exit();
     end
     P_0_o=sum(P_hat_o)
     cost_o=P_0_o*price.lambda_rt/12;
@@ -418,7 +420,7 @@ function fn_cost_RHC_anc(delta_t,P_hat_rt,P_hat,Pg_rt,Pg,P_rsrv_rt,P_rsrv,price,
 
     Pg_diff_scenario = Pg_diff_scenario-
         sum(positive_array(icdf.*sqrt.(pd.sigma+pg.sigma)+pg.mu_scenario));
-    println(string("    ----Case: Real-time Balancing and ", ancillary_type," Reserve Market"))
+    println(string("    ----Case: Real-time Balancing and 10 min Reserve Market"))
     P_rsrv_scenario = price.probability[1]/sum_prob*P_rsrv[1,:];
     Cost_P_rsrv_scenario = reshape(P_rsrv_scenario, 1, T-1)*reshape(price.alpha_scenario[1, 1:T-1],T-1,1);
     if SN>1

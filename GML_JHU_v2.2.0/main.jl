@@ -14,21 +14,22 @@ include("traj_gen.jl")
 include("GML_struct.jl")
 include("GML_RHC.jl")
 
-function main(ancillary_type, T, BN, F, SN, p_rate, icdf, Pred_length, solar_error_max,
+function main(ancillary_type, T, BN, F, SN,
+    p_rate, icdf, Pred_length, solar_error_max,
     price_raw, delta_rt_raw, pd_raw, pd_noise, pg_noise, pg_raw,
     folder, filename)
 
-    for current_time=1:T
+    for current_time=1:288
         ct_printout = string("===== GML - At Time ", current_time);
         println("=================================================")
         println(ct_printout)
-        if current_time ==1
+        if current_time == 1
             global P_rsrv_feedback = [];
             global B_feedback=reshape([0.0910,0.0942,0.1434,0.1402,0.1382,0.2144,0.1192,0.1813,
                 0.1355,0.0664,0.1182,0.0580],12,1);
         end
 
-        global feedback = (B_feedback=(B_feedback), P_rsrv_feedback=(P_rsrv_feedback));
+        feedback = (B_feedback=(B_feedback), P_rsrv_feedback=(P_rsrv_feedback));
         price = price_traj(current_time, ancillary_type, price_raw, delta_rt_raw, T, Pred_length);
         # plot(1:287, price.alpha_scenario[1,:])
         pd = pd_traj(current_time, pd_raw, pd_noise, BN, T, Pred_length);

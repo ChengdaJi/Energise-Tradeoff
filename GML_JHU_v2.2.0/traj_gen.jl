@@ -60,8 +60,24 @@ function pg_traj(t, pg_raw, pg_noise, solar_error_max, p_rate, T, Pred_length);
     da_raw = p_rate*pg_raw.pg_da;
     mu_rt = rt_raw[:,t]
     pred = zeros(12, Pred_length)
+    traj025 = 0.01:(0.025-0.01)/(Pred_length-1):0.025
+    traj05 = 0.01:(0.05-0.01)/(Pred_length-1):0.05
+    traj1 = 0.01:(0.1-0.01)/(Pred_length-1):0.1
+    traj5 = 0.01:(0.5-0.01)/(Pred_length-1):0.5
+    if solar_error_max == 0.025
+        traj = traj025;
+    elseif solar_error_max == 0.05
+        traj = traj05;
+    elseif solar_error_max == 0.1
+        traj = traj1;
+    elseif solar_error_max == 0.5
+        traj = traj1;
+    end
     for feeder=1:12
-        pg_ratio = positive_array(pg_noise[feeder][t,1:Pred_length].+1);
+        temp=sqrt.(traj./traj025);
+        temp1=temp.*pg_noise[feeder][t,1:Pred_length];
+        # pg_ratio = positive_array(pg_noise[feeder][t,1:Pred_length].+1);
+        pg_ratio=positive_array(temp1.+1)
         pred[feeder, :]=rt_raw[feeder,t+1:t+Pred_length].*pg_ratio;
     end
     mu_scenario = hcat(pred, da_raw[:,t+1+Pred_length:t+T-1])
