@@ -17,9 +17,9 @@ include("GML_RHC.jl")
 function main(ancillary_type, T, BN, F, SN,
     p_rate, icdf, Pred_length, solar_error_max,
     price_raw, delta_rt_raw, pd_raw, pd_noise, pg_noise, pg_raw,
-    folder, filename)
+    folder, filename, B_cap)
 
-    for current_time=1:288
+    for current_time=1:1
         ct_printout = string("===== GML - At Time ", current_time);
         println("=================================================")
         println(ct_printout)
@@ -34,7 +34,7 @@ function main(ancillary_type, T, BN, F, SN,
         # plot(1:287, price.alpha_scenario[1,:])
         pd = pd_traj(current_time, pd_raw, pd_noise, BN, T, Pred_length);
         pg = pg_traj(current_time, pg_raw, pg_noise, solar_error_max, p_rate, T, Pred_length);
-        obj = GML_Sys_Ava(T, F, BN, SN, pd, ancillary_type, icdf);
+        obj = GML_Sys_Ava(T, F, BN, SN, pd, ancillary_type, icdf, B_cap);
         val_opt = optimal_stoach_scenario(current_time, obj, feedback, pd, pg,
             price, ancillary_type);
         for feeder = 1:12

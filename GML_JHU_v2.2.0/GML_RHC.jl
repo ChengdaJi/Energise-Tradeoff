@@ -1,4 +1,4 @@
-function GML_Sys_Ava(T, F, BN, SN, pd, ancillary_type, icdf)
+function GML_Sys_Ava(T, F, BN, SN, pd, ancillary_type, icdf, B_cap)
 
     println("===== GML - Boundaries Buildup");
 
@@ -10,7 +10,7 @@ function GML_Sys_Ava(T, F, BN, SN, pd, ancillary_type, icdf)
     # minimum solar
     Pg_min = zeros(F, T);
     # battery
-    B_rate=3;
+    B_rate=B_cap;
     R_rate=1/3;
     B_max = ones(F,1)*B_rate*ones(1,T)/12;
     B_min = zeros(F,T);
@@ -386,7 +386,12 @@ function optimal_stoach_scenario(current_time, obj, feedback, pd, pg, price, anc
         exit();
     end
     P_0_o=sum(P_hat_o)
-    cost_o=P_0_o*price.lambda_rt/12;
+    if ancillary_type == "without"
+        cost_o=P_0_o*price.lambda_rt/12 - beta*(sum(Pg_o.-pg.mu_rt))/12;
+    elseif ancillary_type == "10min" || ancillary_type == "30min"
+        cost_o=P_0_o*price.lambda_rt/12 - beta*(sum(Pg_o)-sum(pg.mu_rt))/12-
+        delta_t*price.alpha_rt*P_rsrv_o;
+    end
     Pf_o=zeros(F,1)
     for feeder = 1:F
         Pf_o[feeder,1]=Pd[feeder,1]-Pg_o[feeder,1]-R_o[feeder,1]
