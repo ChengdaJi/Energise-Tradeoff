@@ -15,7 +15,7 @@ SN=6;
 ################################################################################
 
 # Ancillar Markets Considered: "without", "10min", "30min"
-a_types=["without", "10min"]
+a_types=["10min"]
 
 # penetation levels
 p_rate = [0.25, 0.5, 0.75, 1];
