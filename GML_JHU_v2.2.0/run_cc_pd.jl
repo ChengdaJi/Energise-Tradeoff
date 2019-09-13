@@ -18,7 +18,8 @@ SN=6;
 ancillary_type = "10min"
 # penetation levels
 # p_rate = [0.25 0.5 0.75, 1]; #[0.25, 0.5, 0.75, 1];
-p_rate = [0.25]
+# p_rate = [0.25, 0.5, 0.75, 1];
+p_rate=[0.75]
 # chance constraint [50, 99] #[95, 90, 85]
 
 # icdf = [0, -2.3263]; #[-1.6449,-1.2816, -1.0364];
@@ -88,7 +89,7 @@ for p in p_rate
         folder = string(folder, "pred/pred_", Integer(pred_length*5), "/");
         filename = string(filename, "pred_", Integer(pred_length*5));
 
-        main(a_type, T, BN, F, SN, p, default_i, pred_length, default_sem,
+        main(ancillary_type, T, BN, F, SN, p, default_i, pred_length, default_sem,
              price_raw, delta_rt_raw, pd_raw, pd_noise, pg_noise, pg_raw,
              folder, filename, default_B_cap);
 

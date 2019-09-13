@@ -18,7 +18,7 @@ SN=6;
 ancillary_type = "10min"
 # penetation levels
 # p_rate = [0.25 0.5 0.75, 1]; #[0.25, 0.5, 0.75, 1];
-p_rate = [0.25]
+p_rate = [0.25];
 # chance constraint [50, 99] #[95, 90, 85]
 
 # icdf = [0, -2.3263]; #[-1.6449,-1.2816, -1.0364];
@@ -53,67 +53,59 @@ pg_raw = read_solar_data()
 default_i = -1.6449; default_pred_length = 12; default_sem = 0.1; default_B_cap = 3;
 
 for p in p_rate
-    for i in icdf
+#     for i in icdf
+#         folder = string("./results/");
+#         folder = string(folder, "ten_min_anc/");
+#         filename = "ten_min_anc_";
+#         folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
+#         filename = string(filename, "p_rate_", Integer(p*100), "_");
+#         if i == -1.6449
+#             folder = string(folder, "cc/cc_95/");
+#             filename = string(filename, "cc_95");
+#         elseif i == -1.2816
+#             folder = string(folder, "cc/cc_90/");
+#             filename = string(filename,"cc_90");
+#         elseif i == -2.3263
+#             folder = string(folder, "cc/cc_99/");
+#             filename = string(filename,"cc_99");
+#         end
+#
+#         main(ancillary_type, T, BN, F, SN, p, i, default_pred_length, default_sem,
+#              price_raw, delta_rt_raw, pd_raw, pd_noise, pg_noise, pg_raw,
+#              folder, filename, default_B_cap);
+#
+#     end
+
+
+    for sem in solar_error_max
+
         folder = string("./results/");
         folder = string(folder, "ten_min_anc/");
         filename = "ten_min_anc_";
         folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
         filename = string(filename, "p_rate_", Integer(p*100), "_");
-        if i == -1.6449
-            folder = string(folder, "cc/cc_95/");
-            filename = string(filename, "cc_95");
-        elseif i == -1.2816
-            folder = string(folder, "cc/cc_90/");
-            filename = string(filename,"cc_90");
-        elseif i == -2.3263
-            folder = string(folder, "cc/cc_99/");
-            filename = string(filename,"cc_99");
-        end
 
-        main(ancillary_type, T, BN, F, SN, p, i, default_pred_length, default_sem,
+        folder = string(folder, "solar/solar_", Integer(sem*1000), "/")
+        filename = string(filename, "solar_", Integer(sem*1000));
+
+        main(ancillary_type, T, BN, F, SN, p, default_i, default_pred_length, sem,
              price_raw, delta_rt_raw, pd_raw, pd_noise, pg_noise, pg_raw,
              folder, filename, default_B_cap);
-
     end
 
-    for pred_length in Pred_length
+    for bc in B_cap
 
         folder = string("./results/");
-        filename = "";
         folder = string(folder, "ten_min_anc/");
         filename = "ten_min_anc_";
         folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
         filename = string(filename, "p_rate_", Integer(p*100), "_");
+        folder = string(folder, "b_cap/b_cap_", Integer(bc), "/")
 
-        folder = string(folder, "pred/pred_", Integer(pred_length*5), "/");
-        filename = string(filename, "pred_", Integer(pred_length*5));
+        filename = string(filename, "b_cap_", Integer(bc));
 
-        main(a_type, T, BN, F, SN, p, default_i, pred_length, default_sem,
+        main(ancillary_type, T, BN, F, SN, p, default_i, default_pred_length, default_sem,
              price_raw, delta_rt_raw, pd_raw, pd_noise, pg_noise, pg_raw,
-             folder, filename, default_B_cap);
-
+             folder, filename, bc);
     end
-
-    # for sem in solar_error_max
-    #
-    #     folder = string("./results/");
-    #     filename = "";
-    #     if a_type == "without"
-    #         folder = string(folder, "no_anc/");
-    #         filename = "no_anc_";
-    #     elseif a_type == "10min"
-    #         folder = string(folder, "ten_min_anc/");
-    #         filename = "ten_min_anc_";
-    #     end
-    #     folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
-    #     filename = string(filename, "p_rate_", Integer(p*100), "_");
-    #
-    #     folder = string(folder, "solar/solar_", Integer(sem*1000), "/")
-    #     filename = string(filename, "solar_", Integer(sem*1000));
-    #
-    #     main(a_type, T, BN, F, SN, p, default_i, default_pred_length, sem,
-    #          price_raw, delta_rt_raw, pd_raw, pd_noise, pg_noise, pg_raw,
-    #          folder, filename);
-    #
-    # end
 end
