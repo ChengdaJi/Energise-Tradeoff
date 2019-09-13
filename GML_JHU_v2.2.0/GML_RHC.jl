@@ -389,7 +389,7 @@ function optimal_stoach_scenario(current_time, obj, feedback, pd, pg, price, anc
     if ancillary_type == "without"
         cost_o=P_0_o*price.lambda_rt/12 - beta*(sum(Pg_o.-pg.mu_rt))/12;
     elseif ancillary_type == "10min" || ancillary_type == "30min"
-        cost_o=P_0_o*price.lambda_rt/12 - beta*(sum(Pg_o)-sum(pg.mu_rt))/12-
+        cost_o=P_0_o*price.lambda_rt/12 + beta*(sum(Pg_o)-sum(pg.mu_rt))/12-
         delta_t*price.alpha_rt*P_rsrv_o;
     end
     Pf_o=zeros(F,1)
