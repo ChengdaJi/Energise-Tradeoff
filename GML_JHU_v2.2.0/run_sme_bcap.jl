@@ -19,10 +19,8 @@ ancillary_type = "10min"
 # penetation levels
 # p_rate = [0.25 0.5 0.75, 1]; #[0.25, 0.5, 0.75, 1];
 p_rate = [0.25, 0.5, 0.75, 1];
-# chance constraint [50, 99] #[95, 90, 85]
 
-# icdf = [0, -2.3263]; #[-1.6449,-1.2816, -1.0364];
-# [90.95,99]
+# chance constraint [90,95,99]
 icdf = [-1.2816, -1.6449, -2.3263]
 # prediction length [2hr, 1hr, .5hr]
 Pred_length = [24, 12, 6];
