@@ -18,8 +18,7 @@ SN=6;
 ancillary_type = "10min"
 # penetation levels
 # p_rate = [0.25 0.5 0.75, 1]; #[0.25, 0.5, 0.75, 1];
-# p_rate = [0.25, 0.5, 0.75, 1];
-p_rate=[0.75]
+p_rate = [0.25, 0.5, 0.75, 1];
 # chance constraint [50, 99] #[95, 90, 85]
 
 # icdf = [0, -2.3263]; #[-1.6449,-1.2816, -1.0364];
@@ -55,7 +54,7 @@ default_i = -1.6449; default_pred_length = 12; default_sem = 0.1; default_B_cap 
 
 for p in p_rate
     for i in icdf
-        folder = string("./results/");
+        folder = string("./results_0912/");
         folder = string(folder, "ten_min_anc/");
         filename = "ten_min_anc_";
         folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
@@ -79,7 +78,7 @@ for p in p_rate
 
     for pred_length in Pred_length
 
-        folder = string("./results/");
+        folder = string("./results_0912/");
         filename = "";
         folder = string(folder, "ten_min_anc/");
         filename = "ten_min_anc_";
