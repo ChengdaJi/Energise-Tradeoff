@@ -18,8 +18,8 @@ SN=6;
 ancillary_type = "10min"
 # penetation levels
 # p_rate = [0.25 0.5 0.75, 1]; #[0.25, 0.5, 0.75, 1];
-# p_rate = [0.25, 0.5, 0.75, 1];
-p_rate=[0.75]
+p_rate = [0.25, 0.5, 0.75, 1];
+
 # chance constraint [50, 99] #[95, 90, 85]
 
 # icdf = [0, -2.3263]; #[-1.6449,-1.2816, -1.0364];
@@ -95,26 +95,4 @@ for p in p_rate
 
     end
 
-    # for sem in solar_error_max
-    #
-    #     folder = string("./results/");
-    #     filename = "";
-    #     if a_type == "without"
-    #         folder = string(folder, "no_anc/");
-    #         filename = "no_anc_";
-    #     elseif a_type == "10min"
-    #         folder = string(folder, "ten_min_anc/");
-    #         filename = "ten_min_anc_";
-    #     end
-    #     folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
-    #     filename = string(filename, "p_rate_", Integer(p*100), "_");
-    #
-    #     folder = string(folder, "solar/solar_", Integer(sem*1000), "/")
-    #     filename = string(filename, "solar_", Integer(sem*1000));
-    #
-    #     main(a_type, T, BN, F, SN, p, default_i, default_pred_length, sem,
-    #          price_raw, delta_rt_raw, pd_raw, pd_noise, pg_noise, pg_raw,
-    #          folder, filename);
-    #
-    # end
 end

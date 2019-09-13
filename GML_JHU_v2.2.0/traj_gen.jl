@@ -62,19 +62,9 @@ function pg_traj(t, pg_raw, pg_noise, solar_error_max, p_rate, T, Pred_length);
     mu_rt = rt_raw[:,t]
     pred = zeros(12, Pred_length)
     traj025 = 0.01:(0.025-0.01)/(Pred_length-1):0.025
-    # traj05 = 0.01:(0.05-0.01)/(Pred_length-1):0.05
-    # traj1 = 0.01:(0.1-0.01)/(Pred_length-1):0.1
-    # traj5 = 0.01:(0.5-0.01)/(Pred_length-1):0.5
+
     traj = 0.01:(solar_error_max-0.01)/(Pred_length-1):solar_error_max;
-    # if solar_error_max == 0.025
-    #     traj = traj025;
-    # elseif solar_error_max == 0.05
-    #     traj = traj05;
-    # elseif solar_error_max == 0.1
-    #     traj = traj1;
-    # elseif solar_error_max == 0.5
-    #     traj = traj1;
-    # end
+
     for feeder=1:12
         temp=sqrt.(traj./traj025);
         temp1=temp.*pg_noise[feeder][t,1:Pred_length];
@@ -87,7 +77,7 @@ function pg_traj(t, pg_raw, pg_noise, solar_error_max, p_rate, T, Pred_length);
     mu = hcat(reshape(mu_rt, 12, 1), mu_scenario);
     ratio = reshape(0.01:(solar_error_max-0.01)/23:(solar_error_max-0.01)/23*(Pred_length-1)+0.01, 1, Pred_length)
     pred_square = pred.^2;
-    sigma = hcat(ones(12,1)*ratio.*pred_square, p_rate^2*solar_error_max*da.^2);
+    sigma = hcat(ones(12,1)*ratio.*pred_square, p_rate^2*2*solar_error_max*da.^2);
     # pg=pg_struct(mu,mu_rt,mu_scenario,sigma);
     pg=pg_struct(mu,mu_rt,mu_scenario,sigma);
     return pg
