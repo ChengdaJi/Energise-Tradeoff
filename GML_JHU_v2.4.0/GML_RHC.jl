@@ -147,7 +147,7 @@ function optimal_stoach_scenario(current_time, obj, feedback, pd, pg, price, anc
     end
     @constraint(m, v_0_rt[1,1]>=V_min^2);
     @constraint(m, v_0_rt[1,1]<=V_max^2);
-    @constraint(m, sum(Q_hat_rt)<=0.05*sum(P_hat_rt));
+    # @constraint(m, sum(Q_hat_rt)<=0.05*sum(P_hat_rt));
 
 
 
@@ -211,7 +211,7 @@ function optimal_stoach_scenario(current_time, obj, feedback, pd, pg, price, anc
             end
             @constraint(m, V_min_0^2<=v_0[scenario,t]);
             @constraint(m, V_max_0^2>=v_0[scenario,t]);
-            @constraint(m, sum(Q_hat[scenario,:,t])<=0.05*sum(P_hat[scenario,:,t]));
+            # @constraint(m, sum(Q_hat[scenario,:,t])<=0.05*sum(P_hat[scenario,:,t]));
         end
     end
     ###########################################################################
@@ -358,12 +358,14 @@ function optimal_stoach_scenario(current_time, obj, feedback, pd, pg, price, anc
     status=optimize!(m);
 
     println(string("    ----", termination_status(m)))
-    # println(MOI.PrimalStatus())
-    # println(MOI.DualStatus())
-    cost_current_data = JuMP.objective_value(m);
+    cost_total = JuMP.objective_value(m);
     time_solve=MOI.get(m, MOI.SolveTime());
     println(string("    ----Solve Time: ", time_solve))
-    println(string("    ----Optimal Cost: ", cost_current_data))
+    println(string("    ----Optimal Cost: ", cost_total))
+    cost_printout = JuMP.objective_value(m);
+    time_solve=MOI.get(m, MOI.SolveTime());
+    println(string("    ----Solve Time: ", time_solve))
+    println(string("    ----Optimal Cost: ", cost_printout))
     ## obtaining value
     Qf_o=JuMP.value.(Qf_rt)
     Pg_o=JuMP.value.(Pg_rt)
@@ -373,23 +375,24 @@ function optimal_stoach_scenario(current_time, obj, feedback, pd, pg, price, anc
     Q_hat_o=JuMP.value.(Q_hat_rt)
     l_o=JuMP.value.(l_rt)
     v_o=JuMP.value.(v_rt)
-    if ancillary_type == "10min"
+    v_0_o=JuMP.value.(v_0_rt)
+    if ancillary_type == "10min" || ancillary_type == "30min"
         P_rsrv_o=JuMP.value(P_rsrv_rt);
         B_rsrv_o=JuMP.value(B_rsrv_rt);
         P_rsrv_s=JuMP.value.(P_rsrv);
         B_rsrv_s=JuMP.value.(B_rsrv);
-    elseif ancillary_type == "without"
+    else
         P_rsrv_o = 0;
         B_rsrv_o = 0;
-    else
-        println("Invalid ancillary type.")
-        exit();
     end
     P_0_o=sum(P_hat_o)
+    cost_o=P_0_o*price.lambda_rt/12-
+        (beta*sum(pg.mu_rt[:,1])-sum(Pg_o[:,1]))/12-
+        price.alpha_rt*P_rsrv_o/12;
     if ancillary_type == "without"
-        cost_o=P_0_o*price.lambda_rt/12 + beta*(sum(Pg_o.-pg.mu_rt))/12;
+        cost_o=P_0_o*price.lambda_rt/12 - beta*(sum(Pg_o.-pg.mu_rt))/12;
     elseif ancillary_type == "10min" || ancillary_type == "30min"
-        cost_o=P_0_o*price.lambda_rt/12 + beta*(sum(Pg_o)-sum(pg.mu_rt))/12-
+        cost_o=P_0_o*price.lambda_rt/12 - beta*(sum(Pg_o)-sum(pg.mu_rt))/12-
         delta_t*price.alpha_rt*P_rsrv_o;
     end
     Pf_o=zeros(F,1)
@@ -397,7 +400,9 @@ function optimal_stoach_scenario(current_time, obj, feedback, pd, pg, price, anc
         Pf_o[feeder,1]=Pd[feeder,1]-Pg_o[feeder,1]-R_o[feeder,1]
     end
 
-    val_opt = Optimization_output_struct(Pf_o, Qf_o, Pg_o, B_o, R_o, P_hat_o, Q_hat_o, l_o, v_o, P_rsrv_o, B_rsrv_o, P_0_o, cost_o, time_solve)
+    val_opt = (Pf = (Pf_o), Qf=(Qf_o), Pg = (Pg_o), B=(B_o), R=(R_o), P_hat = (P_hat_o), Q_hat = (Q_hat_o),
+    l = (l_o), v = (v_o), v_0=(v_0_o), P_rsrv = (P_rsrv_o), B_rsrv = (B_rsrv_o), P_0 = (P_0_o),
+    cost=(cost_o), time = (time_solve))
     return val_opt
 end
 

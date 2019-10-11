@@ -54,7 +54,7 @@ default_i = -1.6449; default_pred_length = 12; default_sem = 0.1; default_B_cap 
 
 for p in p_rate
     for i in icdf
-        folder = string("./results_0912/");
+        folder = string("./results_1011/");
         folder = string(folder, "ten_min_anc/");
         filename = "ten_min_anc_";
         folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
@@ -71,24 +71,6 @@ for p in p_rate
         end
 
         main(ancillary_type, T, BN, F, SN, p, i, default_pred_length, default_sem,
-             price_raw, delta_rt_raw, pd_raw, pd_noise, pg_noise, pg_raw,
-             folder, filename, default_B_cap);
-
-    end
-
-    for pred_length in Pred_length
-
-        folder = string("./results_0912/");
-        filename = "";
-        folder = string(folder, "ten_min_anc/");
-        filename = "ten_min_anc_";
-        folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
-        filename = string(filename, "p_rate_", Integer(p*100), "_");
-
-        folder = string(folder, "pred/pred_", Integer(pred_length*5), "/");
-        filename = string(filename, "pred_", Integer(pred_length*5));
-
-        main(ancillary_type, T, BN, F, SN, p, default_i, pred_length, default_sem,
              price_raw, delta_rt_raw, pd_raw, pd_noise, pg_noise, pg_raw,
              folder, filename, default_B_cap);
 

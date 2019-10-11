@@ -55,7 +55,7 @@ for p in p_rate
 
     for sem in solar_error_max
 
-        folder = string("./results_0912/");
+        folder = string("./results_1011/");
         folder = string(folder, "ten_min_anc/");
         filename = "ten_min_anc_";
         folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
@@ -71,13 +71,12 @@ for p in p_rate
 
     for bc in B_cap
 
-        folder = string("./results_0912/");
+        folder = string("./results_1011/");
         folder = string(folder, "ten_min_anc/");
         filename = "ten_min_anc_";
         folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
         filename = string(filename, "p_rate_", Integer(p*100), "_");
         folder = string(folder, "b_cap/b_cap_", Integer(bc), "/")
-
         filename = string(filename, "b_cap_", Integer(bc));
 
         main(ancillary_type, T, BN, F, SN, p, default_i, default_pred_length, default_sem,
