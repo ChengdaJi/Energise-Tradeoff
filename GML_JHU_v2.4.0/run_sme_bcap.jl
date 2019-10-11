@@ -1,6 +1,6 @@
 # This runs all of the jobs necessary for our trade-off analysis
 
-include("main.jl")
+include("GML.jl")
 
 # # of timeslots
 T=288;
