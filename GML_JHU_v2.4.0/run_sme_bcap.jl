@@ -79,7 +79,7 @@ for p in p_rate
         folder = string(folder, "b_cap/b_cap_", Integer(bc), "/")
         filename = string(filename, "b_cap_", Integer(bc));
 
-        main(ancillary_type, T, BN, F, SN, p, default_i, default_pred_length, default_sem,
+        GML(ancillary_type, T, BN, F, SN, p, default_i, default_pred_length, default_sem,
              price_raw, delta_rt_raw, pd_raw, pd_noise, pg_noise, pg_raw,
              folder, filename, bc);
     end

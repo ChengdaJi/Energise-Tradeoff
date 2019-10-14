@@ -356,12 +356,6 @@ function optimal_stoach_scenario(current_time, obj, feedback, pd, pg, price, anc
         exit()
     end
     status=optimize!(m);
-
-    println(string("    ----", termination_status(m)))
-    cost_total = JuMP.objective_value(m);
-    time_solve=MOI.get(m, MOI.SolveTime());
-    println(string("    ----Solve Time: ", time_solve))
-    println(string("    ----Optimal Cost: ", cost_total))
     cost_printout = JuMP.objective_value(m);
     time_solve=MOI.get(m, MOI.SolveTime());
     println(string("    ----Solve Time: ", time_solve))
@@ -385,14 +379,23 @@ function optimal_stoach_scenario(current_time, obj, feedback, pd, pg, price, anc
         P_rsrv_o = 0;
         B_rsrv_o = 0;
     end
+    # in S 1
+    Pg_s = JuMP.value.(Pg[1,:,:])
+    # sum_pg=zeros(12, 287)
+    # for t=1:287
+    #     for feeder = 1:12
+    #         sum_pg[feeder, t]=positive_scalar(icdf*sqrt(pd.sigma[feeder,t]+pg.sigma[feeder,t])+pg.mu_scenario[feeder,t])
+    #     end
+    # end
+    # println(string("solar ultilize ratio", (sum(Pg_s)+sum(Pg_o))/sum(sum_pg)))
     P_0_o=sum(P_hat_o)
     cost_o=P_0_o*price.lambda_rt/12-
         (beta*sum(pg.mu_rt[:,1])-sum(Pg_o[:,1]))/12-
         price.alpha_rt*P_rsrv_o/12;
     if ancillary_type == "without"
-        cost_o=P_0_o*price.lambda_rt/12 - beta*(sum(Pg_o.-pg.mu_rt))/12;
+        cost_o=P_0_o*price.lambda_rt/12 + beta*(sum(Pg_o.-pg.mu_rt))/12;
     elseif ancillary_type == "10min" || ancillary_type == "30min"
-        cost_o=P_0_o*price.lambda_rt/12 - beta*(sum(Pg_o)-sum(pg.mu_rt))/12-
+        cost_o=P_0_o*price.lambda_rt/12 + beta*(sum(Pg_o)-sum(pg.mu_rt))/12-
         delta_t*price.alpha_rt*P_rsrv_o;
     end
     Pf_o=zeros(F,1)
@@ -499,12 +502,25 @@ function write_output_out(val_opt, filename)
     time = repeat([val_opt.time], 12, 1)
     P_0 = repeat([val_opt.P_0], 12, 1)
     p_rsrv = repeat([val_opt.P_rsrv], 12, 1)
+    B_rsrv = repeat([val_opt.B_rsrv], 12, 1)
+    v_0 = zeros(12,1)
+    v_0[1]=val_opt.v_0[1,1]
+    v=zeros(12,1)
+    v[1:3]=val_opt.v
+    # v = [val_opt.v, zeros(9,1)]
+    l=zeros(12,1)
+    l[1:3]=val_opt.l;
+    l = [val_opt.l; zeros(9,1)]
+    P_hat=zeros(12,1)
+    P_hat[1:3]=val_opt.P_hat;
+    Q_hat=zeros(12,1)
+    Q_hat[1:3]=val_opt.Q_hat;
     global feeder_num=[string("feeder",1)]
     for i=2:12
         feeder_num=vcat(feeder_num, string("feeder",i))
     end
-    RT_data_feeder=hcat(feeder_num, val_opt.Pf, val_opt.Qf, val_opt.Pg, val_opt.B,val_opt.R, p_rsrv, P_0, cost, time)
-    CSV.write(filename, DataFrame(RT_data_feeder, [:Feeder, :Pf, :QF, :Pg, :B, :R, :P_rsrv, :P_0, :Cost, :time]));
+    RT_data_feeder=hcat(feeder_num, val_opt.Pf, val_opt.Qf, val_opt.Pg, val_opt.B, val_opt.R, p_rsrv, B_rsrv, P_0, cost, time, v_0, v, l, P_hat, Q_hat)
+    CSV.write(filename, DataFrame(RT_data_feeder, [:Feeder, :Pf, :QF, :Pg, :B, :R, :P_rsrv, :B_rsrv, :P_0, :Cost, :time, :v_0, :v, :l, :P_hat, :Q_hat]));
     # println("    ---- Finish writting files! ")
 end
 
