@@ -27,7 +27,7 @@ for c in cc
     pg_sum_ra = [];
     for p in p_rate
 
-        folder = "results_0912/"; filename = "";
+        folder = "results_1011/"; filename = "";
         folder = string(folder, "ten_min_anc/");
         filename = string(filename, "ten_min_anc_");
         folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
@@ -53,44 +53,44 @@ for c in cc
     push!(df_power, [c; pg_sum_ra])
 
 end
-mkpath("./results_0912/analysis/")
-CSV.write("./results_0912/analysis/cc_table_cost.csv", df_cost)
-CSV.write("./results_0912/analysis/cc_table_power.csv", df_power)
+mkpath("./results_1011/analysis/")
+CSV.write("./results_1011/analysis/cc_table_cost.csv", df_cost)
+CSV.write("./results_1011/analysis/cc_table_power.csv", df_power)
 
-df_cost = DataFrame(PredLength=Integer[], pen_25=Float64[],
-    pen_50=Float64[], pen_75=Float64[], pen_100=Float64[])
-df_power = DataFrame(PredLength=Integer[], pen_25=Float64[],
-    pen_50=Float64[], pen_75=Float64[], pen_100=Float64[])
-for pred_length in Pred_length
-    cost_sum_ra = [];
-    pg_sum_ra = [];
-    for p in p_rate
-        folder = "./results_0912/"; filename = "";
-        folder = string(folder, "ten_min_anc/");
-        filename = string(filename, "ten_min_anc_");
-        folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
-        filename = string(filename, "p_rate_", Integer(p*100), "_");
-        folder = string(folder, "pred/pred_", pred_length, "/")
-        filename = string(filename, "pred_", pred_length, "_")
-
-        Cost = zeros(1,288)
-        Pg = zeros(12,288)
-        for time=1:T
-            name=string(filename, "time", time, ".csv");
-            data_trace = CSV.File(string(folder, name)) |> DataFrame
-            Cost_temp= collect(data_trace[:,Symbol("Cost")])
-            Cost[1,time] = Cost_temp[1]
-            Pg_temp= collect(data_trace[:,Symbol("Pg")])
-            Pg[:,time] = Pg_temp
-        end
-        push!(cost_sum_ra, sum(Cost))
-        push!(pg_sum_ra, sum(Pg))
-    end
-    push!(df_cost, [pred_length; cost_sum_ra])
-    push!(df_power, [pred_length; pg_sum_ra])
-end
-CSV.write("./results_0912/analysis/pred_table_cost.csv", df_cost)
-CSV.write("./results_0912/analysis/pred_table_power.csv", df_power)
+# df_cost = DataFrame(PredLength=Integer[], pen_25=Float64[],
+#     pen_50=Float64[], pen_75=Float64[], pen_100=Float64[])
+# df_power = DataFrame(PredLength=Integer[], pen_25=Float64[],
+#     pen_50=Float64[], pen_75=Float64[], pen_100=Float64[])
+# # for pred_length in Pred_length
+# #     cost_sum_ra = [];
+# #     pg_sum_ra = [];
+# #     for p in p_rate
+# #         folder = "./results_1011/"; filename = "";
+# #         folder = string(folder, "ten_min_anc/");
+# #         filename = string(filename, "ten_min_anc_");
+# #         folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
+# #         filename = string(filename, "p_rate_", Integer(p*100), "_");
+# #         folder = string(folder, "pred/pred_", pred_length, "/")
+# #         filename = string(filename, "pred_", pred_length, "_")
+# #
+# #         Cost = zeros(1,288)
+# #         Pg = zeros(12,288)
+# #         for time=1:T
+# #             name=string(filename, "time", time, ".csv");
+# #             data_trace = CSV.File(string(folder, name)) |> DataFrame
+# #             Cost_temp= collect(data_trace[:,Symbol("Cost")])
+# #             Cost[1,time] = Cost_temp[1]
+# #             Pg_temp= collect(data_trace[:,Symbol("Pg")])
+# #             Pg[:,time] = Pg_temp
+# #         end
+# #         push!(cost_sum_ra, sum(Cost))
+# #         push!(pg_sum_ra, sum(Pg))
+# #     end
+# #     push!(df_cost, [pred_length; cost_sum_ra])
+# #     push!(df_power, [pred_length; pg_sum_ra])
+# # end
+# # CSV.write("./results_1011/analysis/pred_table_cost.csv", df_cost)
+# # CSV.write("./results_1011/analysis/pred_table_power.csv", df_power)
 
 df_cost = DataFrame(SEM=Float64[], pen_25=Float64[],
     pen_50=Float64[], pen_75=Float64[], pen_100=Float64[])
@@ -101,7 +101,7 @@ for sem in solar_error_max
     pg_sum_ra = [];
     for p in p_rate
 
-        folder = "./results_0912/"; filename = "";
+        folder = "./results_1011/"; filename = "";
         folder = string(folder, "ten_min_anc/");
         filename = string(filename, "ten_min_anc_");
         folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
@@ -127,8 +127,8 @@ for sem in solar_error_max
     push!(df_cost, [sem; cost_sum_ra])
     push!(df_power, [sem; pg_sum_ra])
 end
-CSV.write("./results_0912/analysis/sem_table_cost.csv", df_cost)
-CSV.write("./results_0912/analysis/sem_table_power.csv", df_power)
+CSV.write("./results_1011/analysis/sem_table_cost.csv", df_cost)
+CSV.write("./results_1011/analysis/sem_table_power.csv", df_power)
 
 
 df_cost = DataFrame(BCap=Integer[], pen_25=Float64[],
@@ -140,7 +140,7 @@ for b_cap in B_cap
     pg_sum_ra = [];
     for p in p_rate
 
-        folder = "./results_0912/"; filename = "";
+        folder = "./results_1011/"; filename = "";
         folder = string(folder, "ten_min_anc/");
         filename = string(filename, "ten_min_anc_");
         folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
@@ -166,5 +166,6 @@ for b_cap in B_cap
     push!(df_cost, [b_cap; cost_sum_ra])
     push!(df_power, [b_cap; pg_sum_ra])
 end
-CSV.write("./results_0912/analysis/bat_table_cost.csv", df_cost)
-CSV.write("./results_0912/analysis/bat_table_power.csv", df_power)
+CSV.write("./results_1011/analysis/bat_table_cost.csv", df_cost)
+CSV.write("./results_1011/analysis/bat_table_power.csv", df_power)
+return "finish"
