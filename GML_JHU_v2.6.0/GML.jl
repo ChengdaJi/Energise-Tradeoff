@@ -15,11 +15,11 @@ include("GML_struct.jl")
 include("GML_RHC.jl")
 
 function GML(ancillary_type, T, BN, F, SN,
-    p_rate, icdf, Pred_length, solar_error_max,
+    p_rate, icdf, pred_length, solar_error_max, B_cap,
     price_raw, delta_rt_raw, pd_raw, pd_noise, pg_noise, pg_raw,
-    folder, filename, B_cap)
+    folder, filename)
 
-    for current_time=1:T
+    for current_time=1:5
         ct_printout = string("===== GML - At Time ", current_time);
         println("=================================================")
         println(ct_printout)
@@ -30,10 +30,15 @@ function GML(ancillary_type, T, BN, F, SN,
         end
 
         feedback = (B_feedback=(B_feedback), P_rsrv_feedback=(P_rsrv_feedback));
-        price = price_traj(current_time, ancillary_type, price_raw, delta_rt_raw, T, Pred_length);
-        # plot(1:287, price.alpha_scenario[1,:])
-        pd = pd_traj(current_time, pd_raw, pd_noise, BN, T, Pred_length);
-        pg = pg_traj(current_time, pg_raw, pg_noise, solar_error_max, p_rate, T, Pred_length);
+        price = price_traj(current_time, ancillary_type, price_raw, delta_rt_raw, T, pred_length);
+        # println(size(price.alpha_scenario))
+        # println(size(price.lambda_scenario))
+        pd = pd_traj(current_time, pd_raw, pd_noise, BN, T, pred_length);
+        # println(size(pd.traj))
+        # println(size(pd.sigma))
+        pg = pg_traj(current_time, pg_raw, pg_noise, solar_error_max, p_rate, T, pred_length);
+        # println(size(pg.mu))
+        # println(size(pg.sigma))
         obj = GML_Sys_Ava(T, F, BN, SN, pd, ancillary_type, icdf, B_cap);
         val_opt = optimal_stoach_scenario(current_time, obj, feedback, pd, pg,
             price, ancillary_type);
@@ -45,10 +50,10 @@ function GML(ancillary_type, T, BN, F, SN,
         else
             push!(P_rsrv_feedback,val_opt.P_rsrv)
         end
-        mkpath(folder)
-        write_output_out(val_opt,
-            string(folder, filename, "_time", current_time, ".csv"))
-        println("=================================================")
+        # mkpath(folder)
+        # write_output_out(val_opt,
+        #     string(folder, filename, "_time", current_time, ".csv"))
+        # println("=================================================")
 
     end
 end
