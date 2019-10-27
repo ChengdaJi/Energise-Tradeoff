@@ -423,14 +423,12 @@ function fn_cost_RHC_anc(delta_t,P_hat_rt,P_hat,Pg_rt,Pg,P_rsrv_rt,P_rsrv,price,
             end
     end
     # Current time
-    # lambda_ct = reshape(price.probability,1,6)*reshape(price.lambda_scenario[:,1],6,1)[1,1];
     Cost_P_hat_ct = delta_t*lambda_ct*sum(P_hat_rt[:,1]);
 
     Pg_diff_ct = sum(Pg_rt[:,1]) -
         sum(positive_array(icdf.*sqrt.(pd.sigma[:,1]+pg.sigma[:,1])+pg.mu[:,1]));
     Cost_Pg_diff_ct = delta_t*beta*Pg_diff_ct;
 
-    # alpha_ct = reshape(price.probability,1,6).*reshape(price.alpha_scenario[:,1],6,1)[1,1];
     Revenue_P_rsrv_ct = delta_t*alpha_ct*P_rsrv_rt;
 
     # Future
@@ -463,18 +461,6 @@ function fn_cost_RHC_anc(delta_t,P_hat_rt,P_hat,Pg_rt,Pg,P_rsrv_rt,P_rsrv,price,
         +pg.mu[:,2:end]));
     Cost_Pg_diff_scenario = delta_t*beta*Pg_diff_scenario;
     println(string("    ----Case: Real-time Balancing and 10 min Reserve Market"))
-    # P_rsrv_scenario = price.probability[1]/sum_prob*P_rsrv[1,:];
-    # Cost_P_rsrv_scenario = reshape(P_rsrv_scenario, 1, T-1)*reshape(price.alpha_scenario[1, 2:end],T-1,1);
-    # if SN>1
-    #     for scenario =2:SN
-    #         P_rsrv_scenario = price.probability[scenario]/sum_prob*P_rsrv[scenario,:];
-    #         Cost_P_rsrv_scenario = Cost_P_rsrv_scenario+
-    #         reshape(P_rsrv_scenario, 1, T-1)*reshape(price.alpha_scenario[scenario, 2:end],T-1,1);;
-    #     end
-    # end
-    # return delta_t*price.lambda_scenario[:,1]*sum(P_hat_rt[:,1])+(delta_t*Cost_P_hat_scenario)[1,1]+
-    #     delta_t*beta*Pg_diff_scenario-
-    #     delta_t*price.alpha_rt*P_rsrv_rt-(delta_t*Cost_P_rsrv_scenario)[1,1];
     return Cost_P_hat_ct + Cost_Pg_diff_ct- Revenue_P_rsrv_ct +
             Cost_P_hat_scenario[1,1] + Cost_Pg_diff_scenario - Revenue_P_rsrv_scenario[1,1]
 end

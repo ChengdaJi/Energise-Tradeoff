@@ -54,29 +54,29 @@ default_icdf = -1.6449; default_pred_length = 12; default_sem = 0.1; default_B_c
 
 for p in p_rate
 
-    for i in icdf
-        folder = string("./results_1027/");
-        folder = string(folder, "ten_min_anc/");
-        filename = "ten_min_anc_";
-        folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
-        filename = string(filename, "p_rate_", Integer(p*100), "_");
-        if i == -1.6449
-            folder = string(folder, "cc/cc_95/");
-            filename = string(filename, "cc_95");
-        elseif i == -1.2816
-            folder = string(folder, "cc/cc_90/");
-            filename = string(filename,"cc_90");
-        elseif i == -2.3263
-            folder = string(folder, "cc/cc_99/");
-            filename = string(filename,"cc_99");
-        end
-
-        GML(ancillary_type, T, BN, F, SN,
-            p, i , default_pred_length, default_sem, default_B_cap,
-            price_raw, delta_rt_raw, pd_raw, pd_noise, pg_noise, pg_raw,
-            folder, filename)
-
-    end
+    # for i in icdf
+    #     folder = string("./results_1027/");
+    #     folder = string(folder, "ten_min_anc/");
+    #     filename = "ten_min_anc_";
+    #     folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
+    #     filename = string(filename, "p_rate_", Integer(p*100), "_");
+    #     if i == -1.6449
+    #         folder = string(folder, "cc/cc_95/");
+    #         filename = string(filename, "cc_95");
+    #     elseif i == -1.2816
+    #         folder = string(folder, "cc/cc_90/");
+    #         filename = string(filename,"cc_90");
+    #     elseif i == -2.3263
+    #         folder = string(folder, "cc/cc_99/");
+    #         filename = string(filename,"cc_99");
+    #     end
+    #
+    #     GML(ancillary_type, T, BN, F, SN,
+    #         p, i , default_pred_length, default_sem, default_B_cap,
+    #         price_raw, delta_rt_raw, pd_raw, pd_noise, pg_noise, pg_raw,
+    #         folder, filename)
+    #
+    # end
 
     for sem in solar_error_max
 
