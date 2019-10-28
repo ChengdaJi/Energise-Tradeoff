@@ -55,7 +55,7 @@ default_icdf = -1.6449; default_pred_length = 12; default_sem = 0.1; default_B_c
 for p in p_rate
 
     for i in icdf
-        folder = string("./results_1027/");
+        folder = string("./results_1028/");
         folder = string(folder, "ten_min_anc/");
         filename = "ten_min_anc_";
         folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
@@ -78,22 +78,22 @@ for p in p_rate
 
     end
 
-    # for sem in solar_error_max
-    #
-    #     folder = string("./results_1027/");
-    #     folder = string(folder, "ten_min_anc/");
-    #     filename = "ten_min_anc_";
-    #     folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
-    #     filename = string(filename, "p_rate_", Integer(p*100), "_");
-    #
-    #     folder = string(folder, "solar/solar_", Integer(sem*1000), "/")
-    #     filename = string(filename, "solar_", Integer(sem*1000));
-    #
-    #     GML(ancillary_type, T, BN, F, SN,
-    #         p, default_icdf , default_pred_length, sem, default_B_cap,
-    #         price_raw, delta_rt_raw, pd_raw, pd_noise, pg_noise, pg_raw,
-    #         folder, filename)
-    # end
+    for sem in solar_error_max
+
+        folder = string("./results_1028/");
+        folder = string(folder, "ten_min_anc/");
+        filename = "ten_min_anc_";
+        folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
+        filename = string(filename, "p_rate_", Integer(p*100), "_");
+
+        folder = string(folder, "solar/solar_", Integer(sem*1000), "/")
+        filename = string(filename, "solar_", Integer(sem*1000));
+
+        GML(ancillary_type, T, BN, F, SN,
+            p, default_icdf , default_pred_length, sem, default_B_cap,
+            price_raw, delta_rt_raw, pd_raw, pd_noise, pg_noise, pg_raw,
+            folder, filename)
+    end
 
 
 end
