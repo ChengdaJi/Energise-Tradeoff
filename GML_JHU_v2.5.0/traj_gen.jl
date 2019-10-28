@@ -91,3 +91,31 @@ function pg_traj(t, pg_raw, pg_noise, solar_error_max, p_rate, T, Pred_length);
     pg=(mu=(mu),sigma=(sigma), mu_ct=(mu_ct));
     return pg
 end
+
+function pg_traj_uni(t, pg_raw, pg_noise, solar_error_max, p_rate, T, Pred_length);
+    rt_raw = p_rate*pg_raw.pg_rt;
+    da_raw = p_rate*pg_raw.pg_da;
+    mu_rt = rt_raw[:,t];
+    mu_ct = rt_raw[:,t+1];
+    pred = zeros(12, Pred_length)
+    traj025 = 0.025*ones(Pred_length,1)
+
+    traj = solar_error_max*ones(Pred_length,1);
+
+    for feeder=1:12
+        temp=sqrt.(traj./traj025);
+        temp1=temp.*pg_noise[feeder][t,1:Pred_length];
+        # pg_ratio = positive_array(pg_noise[feeder][t,1:Pred_length].+1);
+        pg_ratio=positive_array(temp1.+1)
+        pred[feeder, :]=rt_raw[feeder,t+1:t+Pred_length].*pg_ratio;
+    end
+    da = da_raw[:,t+1+Pred_length:t+T];
+    mu_scenario = hcat(pred, da)
+    mu = mu_scenario;
+    ratio = solar_error_max*ones(1, Pred_length)
+    pred_square = pred.^2;
+    sigma = hcat(ones(12,1)*ratio.*pred_square, p_rate^2*2*solar_error_max*da.^2);
+    # pg=pg_struct(mu,mu_rt,mu_scenario,sigma);
+    pg=(mu=(mu),sigma=(sigma), mu_ct=(mu_ct));
+    return pg
+end

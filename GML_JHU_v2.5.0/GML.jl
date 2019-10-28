@@ -36,7 +36,7 @@ function GML(ancillary_type, T, BN, F, SN,
         pd = pd_traj(current_time, pd_raw, pd_noise, BN, T, pred_length);
         # println(size(pd.traj))
         # println(size(pd.sigma))
-        pg = pg_traj(current_time, pg_raw, pg_noise, solar_error_max, p_rate, T, pred_length);
+        pg = pg_traj_uni(current_time, pg_raw, pg_noise, solar_error_max, p_rate, T, pred_length);
         # println(size(pg.mu))
         # println(size(pg.sigma))
         obj = GML_Sys_Ava(T, F, BN, SN, pd, ancillary_type, icdf, B_cap);
