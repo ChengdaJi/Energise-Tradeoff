@@ -120,7 +120,8 @@ function optimal_stoach_scenario(current_time, obj, feedback, pd, pg, price, anc
     # println(" ---- Real Time Constraint Buildup ")
     for feeder=1:F
         @constraint(m, 0<=Pg_rt[feeder,1]);
-        @constraint(m, pg.mu_rt[feeder,1]>=Pg_rt[feeder,1]);
+        @constraint(m, Pg_rt[feeder,1]<=
+            positive_scalar(icdf*sqrt(pd.sigma[feeder,1]+pg.sigma[feeder,1])+pg.mu[feeder,1]));
         @constraint(m, R_min[feeder,1]<= R_rt[feeder,1]);
         @constraint(m, R_rt[feeder,1]<= R_max[feeder,1]);
         @constraint(m, B_rt[feeder,1]==B_feedback[feeder,1]);
@@ -170,7 +171,7 @@ function optimal_stoach_scenario(current_time, obj, feedback, pd, pg, price, anc
             for feeder=1:F
                 @constraint(m, Pg_min[feeder, t]<=Pg[scenario, feeder ,t]);
                 @constraint(m, Pg[scenario, feeder ,t]<=
-                    positive_scalar(icdf*sqrt(pd.sigma[feeder,t]+pg.sigma[feeder,t])+pg.mu_scenario[feeder,t]));
+                    positive_scalar(icdf*sqrt(pd.sigma[feeder,t+1]+pg.sigma[feeder,t+1])+pg.mu[feeder,t+1]));
                 @constraint(m, B_min[feeder,t+1] <= B[scenario,feeder,t]);
                 @constraint(m, B[scenario,feeder,t]<= B_max[feeder,t+1]);
                 @constraint(m, R_min[feeder,t+1] <= R[scenario,feeder,t]);
@@ -359,7 +360,7 @@ function optimal_stoach_scenario(current_time, obj, feedback, pd, pg, price, anc
     cost_printout = JuMP.objective_value(m);
     time_solve=MOI.get(m, MOI.SolveTime());
     println(string("    ----Solve Time: ", time_solve))
-    println(string("    ----Optimal Cost: ", cost_printout))
+    println(string("    ----Optimal Cost for whole horion: ", cost_printout))
     ## obtaining value
     Qf_o=JuMP.value.(Qf_rt)
     Pg_o=JuMP.value.(Pg_rt)
@@ -381,23 +382,17 @@ function optimal_stoach_scenario(current_time, obj, feedback, pd, pg, price, anc
     end
     # in S 1
     Pg_s = JuMP.value.(Pg[1,:,:])
-    # sum_pg=zeros(12, 287)
-    # for t=1:287
-    #     for feeder = 1:12
-    #         sum_pg[feeder, t]=positive_scalar(icdf*sqrt(pd.sigma[feeder,t]+pg.sigma[feeder,t])+pg.mu_scenario[feeder,t])
-    #     end
-    # end
-    # println(string("solar ultilize ratio", (sum(Pg_s)+sum(Pg_o))/sum(sum_pg)))
-    P_0_o=sum(P_hat_o)
-    cost_o=P_0_o*price.lambda_rt/12-
-        (beta*sum(pg.mu_rt[:,1])-sum(Pg_o[:,1]))/12-
-        price.alpha_rt*P_rsrv_o/12;
+
+    P_0_o = calculate_P0_real(pg, pd, price, R_o, l_o, obj, TB);
+    # println(string("old p0", sum(P_hat_o)))
+    # println(string("new p0", P_0_o))
     if ancillary_type == "without"
-        cost_o=P_0_o*price.lambda_rt/12 + beta*(sum(Pg_o.-pg.mu_rt))/12;
+        cost_o=P_0_o*price.lambda_ct/12 + beta*(sum(Pg_o)-sum(pg.mu_ct))/12;
     elseif ancillary_type == "10min" || ancillary_type == "30min"
-        cost_o=P_0_o*price.lambda_rt/12 + beta*(sum(Pg_o)-sum(pg.mu_rt))/12-
-        delta_t*price.alpha_rt*P_rsrv_o;
+        cost_o=P_0_o*price.lambda_ct/12 + beta*(sum(Pg_o)-sum(pg.mu_ct))/12-
+        delta_t*price.alpha_ct*P_rsrv_o;
     end
+    println(string("    ----Optimal Cost at current time: ", cost_o))
     Pf_o=zeros(F,1)
     for feeder = 1:F
         Pf_o[feeder,1]=Pd[feeder,1]-Pg_o[feeder,1]-R_o[feeder,1]
@@ -415,36 +410,59 @@ function fn_cost_RHC_anc(delta_t,P_hat_rt,P_hat,Pg_rt,Pg,P_rsrv_rt,P_rsrv,price,
     T=obj.T;
     icdf = obj.icdf;
     sum_prob = sum(price.probability[1:SN])
+
+
+    lambda_ct=price.probability[1]/sum_prob*price.lambda_scenario[1,1];
+    alpha_ct=price.probability[1]/sum_prob*price.alpha_scenario[1,1]
+    if SN>1
+        for scenario = 2:SN
+            lambda_ct=lambda_ct+
+                price.probability[scenario]/sum_prob*price.lambda_scenario[scenario,1];
+            alpha_ct=alpha_ct+
+                price.probability[scenario]/sum_prob*price.alpha_scenario[scenario,1];
+            end
+    end
+    # Current time
+    Cost_P_hat_ct = delta_t*lambda_ct*sum(P_hat_rt[:,1]);
+
+    Pg_diff_ct = sum(Pg_rt[:,1]) -
+        sum(positive_array(icdf.*sqrt.(pd.sigma[:,1]+pg.sigma[:,1])+pg.mu[:,1]));
+    Cost_Pg_diff_ct = delta_t*beta*Pg_diff_ct;
+
+    Revenue_P_rsrv_ct = delta_t*alpha_ct*P_rsrv_rt;
+
+    # Future
     P_hat_scenario=
         price.probability[1]/sum_prob*sum(P_hat[1, :, :], dims=1);
-    Cost_P_hat_scenario = P_hat_scenario*reshape(price.lambda_scenario[1, :],T-1,1);
-    Pg_diff_scenario=sum(Pg_rt[:,1])-sum(pg.mu_rt)+
-        price.probability[1]/sum_prob*sum(Pg[1, :, :]);
+    Cost_P_hat_scenario = delta_t*P_hat_scenario*reshape(price.lambda_scenario[1, 2:end],T-1,1);
+
+    Pg_scenario=price.probability[1]/sum_prob*sum(Pg[1, :, :]);
+
+    P_rsrv_scenario = price.probability[1]/sum_prob*P_rsrv[1,:];
+    Revenue_P_rsrv_scenario = delta_t*reshape(P_rsrv_scenario, 1, T-1)*
+        reshape(price.alpha_scenario[1, 2:end],T-1,1);
     if SN>1
         for scenario = 2:SN
             P_hat_scenario=P_hat_scenario+
                 price.probability[scenario]/sum_prob*sum(P_hat[scenario, :, :], dims=1);
-            Cost_P_hat_scenario=Cost_P_hat_scenario+price.probability[scenario]/sum_prob*sum(P_hat[scenario, :, :], dims=1)*
-                reshape(price.lambda_scenario[scenario, :],T-1,1);
-            Pg_diff_scenario = Pg_diff_scenario+
+            Cost_P_hat_scenario=Cost_P_hat_scenario+delta_t*price.probability[scenario]/sum_prob*sum(P_hat[scenario, :, :], dims=1)*
+                reshape(price.lambda_scenario[scenario, 2:end],T-1,1);
+            Pg_scenario = Pg_scenario+
                 price.probability[scenario]/sum_prob*sum(Pg[scenario, :, :]);
+            P_rsrv_scenario = price.probability[scenario]/sum_prob*P_rsrv[scenario,:];
+            Revenue_P_rsrv_scenario = Revenue_P_rsrv_scenario+delta_t*
+                reshape(P_rsrv_scenario, 1, T-1)*reshape(price.alpha_scenario[scenario, 2:end],T-1,1);
         end
     end
 
-    Pg_diff_scenario = Pg_diff_scenario-
-        sum(positive_array(icdf.*sqrt.(pd.sigma+pg.sigma)+pg.mu_scenario));
+    # FOL cost part
+    Pg_diff_scenario = Pg_scenario-
+        sum(positive_array(icdf.*sqrt.(pd.sigma[:,2:end]+pg.sigma[:,2:end])
+        +pg.mu[:,2:end]));
+    Cost_Pg_diff_scenario = delta_t*beta*Pg_diff_scenario;
     println(string("    ----Case: Real-time Balancing and 10 min Reserve Market"))
-    P_rsrv_scenario = price.probability[1]/sum_prob*P_rsrv[1,:];
-    Cost_P_rsrv_scenario = reshape(P_rsrv_scenario, 1, T-1)*reshape(price.alpha_scenario[1, 1:T-1],T-1,1);
-    if SN>1
-        for scenario =2:SN
-            P_rsrv_scenario = price.probability[scenario]/sum_prob*P_rsrv[scenario,:];
-            Cost_P_rsrv_scenario = Cost_P_rsrv_scenario+reshape(P_rsrv_scenario, 1, T-1)*reshape(price.alpha_scenario[scenario, :],T-1,1);;
-        end
-    end
-    return delta_t*price.lambda_rt*sum(P_hat_rt[:,1])+(delta_t*Cost_P_hat_scenario)[1,1]+
-        delta_t*beta*Pg_diff_scenario-
-        delta_t*price.alpha_rt*P_rsrv_rt-(delta_t*Cost_P_rsrv_scenario)[1,1];
+    return Cost_P_hat_ct + Cost_Pg_diff_ct- Revenue_P_rsrv_ct +
+            Cost_P_hat_scenario[1,1] + Cost_Pg_diff_scenario - Revenue_P_rsrv_scenario[1,1]
 end
 
 function fn_cost_RHC_rt(delta_t,P_hat_rt,P_hat,Pg_rt,Pg,price,pg,pd,beta,SN,obj)
@@ -572,4 +590,18 @@ function read_solar_data()
     end
     pg_raw = (pg_rt = (pg_rt), pg_da = (pg_da));
     return pg_raw
+end
+
+function calculate_P0_real(pg, pd, price, R, l, obj, TB)
+    # calculate
+    P_bank=zeros(obj.BN,1);
+    P_line=zeros(obj.BN,1);
+    for bank=1:obj.BN
+        P_bank[bank,1]=
+            sum(pd.ct[TB[bank][feeder],1]-pg.mu_ct[TB[bank][feeder],1]-R[TB[bank][feeder],1] for feeder=1:4);
+        P_line[bank,1]=
+            obj.r[bank]*l[bank,1]+P_bank[bank,1];
+    end
+    P_0 = sum(P_line[bank,1] for bank=1:obj.BN)
+    return P_0
 end

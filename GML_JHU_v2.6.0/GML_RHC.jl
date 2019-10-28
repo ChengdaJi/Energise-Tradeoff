@@ -598,7 +598,7 @@ function calculate_P0_real(pg, pd, price, R, l, obj, TB)
     P_line=zeros(obj.BN,1);
     for bank=1:obj.BN
         P_bank[bank,1]=
-            sum(pd.ct[TB[bank][feeder],1]-pg.mu_ct[TB[bank][feeder],1]+R[TB[bank][feeder],1] for feeder=1:4);
+            sum(pd.ct[TB[bank][feeder],1]-pg.mu_ct[TB[bank][feeder],1]-R[TB[bank][feeder],1] for feeder=1:4);
         P_line[bank,1]=
             obj.r[bank]*l[bank,1]+P_bank[bank,1];
     end
