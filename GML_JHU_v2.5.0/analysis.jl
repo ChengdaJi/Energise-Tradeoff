@@ -4,7 +4,7 @@ using DataFrames
 T = 288;
 
 # penetation levels
-p_rate = [0.75];
+p_rate = [0.25 0.5 0.75 1.0];
 
 # chance constraint [50, 99] #[95, 90, 85]
 cc = [90 95 99];
@@ -17,8 +17,10 @@ solar_error_max = [0.025, 0.1, 0.2];
 
 B_cap = [3 15 30];
 #
-df_cost = DataFrame(CC=Integer[], pen_75=Float64[])
-df_power = DataFrame(CC=Integer[], pen_75=Float64[])
+df_cost = DataFrame(CC=Integer[], pen_25=Float64[],
+    pen_50=Float64[], pen_75=Float64[], pen_100=Float64[])
+df_power = DataFrame(CC=Integer[], pen_25=Float64[],
+    pen_50=Float64[], pen_75=Float64[], pen_100=Float64[])
 for c in cc
 
     cost_sum_ra = [];
@@ -90,8 +92,10 @@ CSV.write("./results_1028/analysis/cc_table_power.csv", df_power)
 # # CSV.write("./results_1011/analysis/pred_table_cost.csv", df_cost)
 # # CSV.write("./results_1011/analysis/pred_table_power.csv", df_power)
 
-df_cost = DataFrame(SEM=Float64[], pen_75=Float64[])
-df_power = DataFrame(SEM=Float64[], pen_75=Float64[])
+df_cost = DataFrame(SEM=Float64[], pen_25=Float64[],
+    pen_50=Float64[], pen_75=Float64[], pen_100=Float64[])
+df_power = DataFrame(SEM=Float64[], pen_25=Float64[],
+    pen_50=Float64[], pen_75=Float64[], pen_100=Float64[])
 for sem in solar_error_max
     cost_sum_ra = [];
     pg_sum_ra = [];

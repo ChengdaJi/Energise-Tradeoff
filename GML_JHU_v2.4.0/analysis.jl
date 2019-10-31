@@ -40,9 +40,9 @@ for c in cc
         for time=1:T
             name=string(filename, "time", time, ".csv");
             data_trace = CSV.File(string(folder, name)) |> DataFrame
-            Cost_temp= collect(data_trace[:,Symbol("Cost")])
+            Cost_temp= collect(data_trace[:,Symbol("P_rsrv")])
             Cost[1,time] = Cost_temp[1]
-            Pg_temp= collect(data_trace[:,Symbol("Pg")])
+            Pg_temp= collect(data_trace[:,Symbol("B_rsrv")])
             Pg[:,time] = Pg_temp
         end
 
