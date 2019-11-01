@@ -72,7 +72,7 @@ function pg_traj(t, pg_raw, pg_noise, solar_error_max, p_rate, T, Pred_length);
     pred = zeros(12, Pred_length)
     traj025 = 0.01:(0.025-0.01)/(Pred_length-1):0.025
     # traj = 0.01:(solar_error_max-0.01)/(Pred_length-1):solar_error_max;
-    traj = traj025.+(solar_error_max-0.025)
+    traj = traj025.+(solar_error_max-0.01)
     for feeder=1:12
         temp=sqrt.(traj./traj025);
         temp1=temp.*pg_noise[feeder][t,1:Pred_length];

@@ -18,7 +18,7 @@ SN=6;
 ancillary_type = "10min"
 # penetation levels
 # p_rate = [0.25 0.5 0.75, 1]; #[0.25, 0.5, 0.75, 1];
-p_rate = [0.25, 0.5, 1];
+p_rate = [0.25, 0.5, 0.75, 1];
 # chance constraint [50, 99] #[95, 90, 85]
 
 # icdf = [0, -2.3263]; #[-1.6449,-1.2816, -1.0364];
@@ -28,7 +28,7 @@ icdf = [-1.2816, -1.6449, -2.3263]
 Pred_length = [24, 12, 6];
 
 # max solar error
-solar_error_max = [0.01, 0.02, 0.03, 0.04, 0.05];
+solar_error_max = [0.01, 0.02, 0.03, 0.035, 0.04, 0.05, 0.085];
 
 # max solar error
 B_cap = [3, 15, 30];
@@ -76,7 +76,7 @@ for p in p_rate
     #         price_raw, delta_rt_raw, pd_raw, pd_noise, pg_noise, pg_raw,
     #         folder, filename)
 
-    end
+    #     end
 
     for sem in solar_error_max
         folder = string("./results_1031/");
