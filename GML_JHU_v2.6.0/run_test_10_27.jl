@@ -28,7 +28,7 @@ icdf = [-1.2816, -1.6449, -2.3263]
 Pred_length = [24, 12, 6];
 
 # max solar error
-solar_error_max = [0.025, 0.1, 0.2];
+solar_error_max = [0.01, 0.02, 0.03, 0.04, 0.05];
 
 # max solar error
 B_cap = [3, 15, 30];
@@ -55,7 +55,7 @@ default_icdf = -1.6449; default_pred_length = 12; default_sem = 0.1; default_B_c
 for p in p_rate
 
     for i in icdf
-        folder = string("./results_1027/");
+        folder = string("./results_1031/");
         folder = string(folder, "ten_min_anc/");
         filename = "ten_min_anc_";
         folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
@@ -79,7 +79,7 @@ for p in p_rate
     end
 
     for sem in solar_error_max
-        folder = string("./results_1027/");
+        folder = string("./results_1031/");
         folder = string(folder, "ten_min_anc/");
         filename = "ten_min_anc_";
         folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
