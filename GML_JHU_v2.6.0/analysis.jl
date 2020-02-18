@@ -4,7 +4,7 @@ using DataFrames
 T = 288;
 
 # penetation levels
-p_rate = [0.25 0.5 0.75 1.0];
+p_rate = [0.25, 0.5, 0.75, 1.0];
 
 # chance constraint [50, 99] #[95, 90, 85]
 cc = [90 95 99];
@@ -13,21 +13,21 @@ cc = [90 95 99];
 Pred_length = [30 60 120];
 
 # max solar error
-solar_error_max = [0.025, 0.1, 0.2];
+solar_error_max = [0.01, 0.02, 0.03, 0.035, 0.04, 0.05, 0.085];
 
 B_cap = [3 15 30];
 #
 df_cost = DataFrame(CC=Integer[], pen_25=Float64[],
-     pen_50=Float64[], pen_75=Float64[], pen_100=Float64[])
+     pen_50=Float64[], pen_75=Float64[],pen_100=Float64[])
 df_power = DataFrame(CC=Integer[], pen_25=Float64[],
-     pen_50=Float64[], pen_75=Float64[], pen_100=Float64[])
+     pen_50=Float64[], pen_75=Float64[],pen_100=Float64[])
 for c in cc
 
     cost_sum_ra = [];
     pg_sum_ra = [];
     for p in p_rate
 
-        folder = "results_1027/"; filename = "";
+        folder = "results_1031/"; filename = "";
         folder = string(folder, "ten_min_anc/");
         filename = string(filename, "ten_min_anc_");
         folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
@@ -53,9 +53,9 @@ for c in cc
     push!(df_power, [c; pg_sum_ra])
 
 end
-mkpath("./results_1027/analysis/")
-CSV.write("./results_1027/analysis/cc_table_cost.csv", df_cost)
-CSV.write("./results_1027/analysis/cc_table_power.csv", df_power)
+mkpath("./results_1031/analysis/")
+CSV.write("./results_1031/analysis/cc_table_cost.csv", df_cost)
+CSV.write("./results_1031/analysis/cc_table_power.csv", df_power)
 
 # df_cost = DataFrame(PredLength=Integer[], pen_25=Float64[],
 #     pen_50=Float64[], pen_75=Float64[], pen_100=Float64[])
@@ -101,7 +101,7 @@ for sem in solar_error_max
     pg_sum_ra = [];
     for p in p_rate
 
-        folder = "./results_1027/"; filename = "";
+        folder = "./results_1031/"; filename = "";
         folder = string(folder, "ten_min_anc/");
         filename = string(filename, "ten_min_anc_");
         folder = string(folder, "p_rate/p_rate_", Integer(p*100), "/");
@@ -127,8 +127,8 @@ for sem in solar_error_max
     push!(df_cost, [sem; cost_sum_ra])
     push!(df_power, [sem; pg_sum_ra])
 end
-CSV.write("./results_1027/analysis/sem_table_cost.csv", df_cost)
-CSV.write("./results_1027/analysis/sem_table_power.csv", df_power)
+CSV.write("./results_1031/analysis/sem_table_cost.csv", df_cost)
+CSV.write("./results_1031/analysis/sem_table_power.csv", df_power)
 
 
 # df_cost = DataFrame(BCap=Integer[], pen_25=Float64[],
