@@ -19,7 +19,7 @@ function GML(ancillary_type, T, BN, F, SN,
     price_raw, delta_rt_raw, pd_raw, pd_noise, pg_noise, pg_raw,
     folder, filename)
 
-    for current_time=1:T
+    for current_time=1:1
         ct_printout = string("===== GML - At Time ", current_time);
         println("=================================================")
         println(ct_printout)
@@ -50,9 +50,9 @@ function GML(ancillary_type, T, BN, F, SN,
         else
             push!(P_rsrv_feedback,val_opt.P_rsrv)
         end
-        mkpath(folder)
-        write_output_out(val_opt,
-            string(folder, filename, "_time", current_time, ".csv"))
+        # mkpath(folder)
+        # write_output_out(val_opt,
+        #     string(folder, filename, "_time", current_time, ".csv"))
         println("=================================================")
 
     end

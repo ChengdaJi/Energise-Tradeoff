@@ -9,7 +9,7 @@ BN=3;
 # # of feeders
 F=BN*4;
 # # of secnarios
-SN=6;
+SN=1;
 
 ################################################################################
 
@@ -17,13 +17,13 @@ SN=6;
 ancillary_type = "10min"
 # penetation levels
 # p_rate = [0.25 0.5 0.75, 1]; #[0.25, 0.5, 0.75, 1];
-p_rate = 0.75;
+p_rate = 0.25;
 
 # [90.95,99]
 # icdf = [-1.2816, -1.6449, -2.3263]
 icdf = -1.2816;
 # prediction length [2hr, 1hr, .5hr]
-pred_length = 24;
+pred_length = 12;
 
 # max solar error
 solar_error_max = 0.25;
